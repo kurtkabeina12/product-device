@@ -1,6 +1,5 @@
 const pool = require('../db');
 
-// Create a new shop
 const createShop = async (name) => {
   const result = await pool.query(
     'INSERT INTO shops (name) VALUES (\$1) RETURNING *',
@@ -9,7 +8,6 @@ const createShop = async (name) => {
   return result.rows[0];
 };
 
-// Get shops with optional filters
 const getShops = async (filters) => {
   const { name } = filters;
   let query = 'SELECT * FROM shops WHERE 1=1';
@@ -24,7 +22,6 @@ const getShops = async (filters) => {
   return result.rows;
 };
 
-// Get a shop by ID
 const getShopById = async (id) => {
   const result = await pool.query(
     'SELECT * FROM shops WHERE id = \$1',
@@ -33,7 +30,6 @@ const getShopById = async (id) => {
   return result.rows[0];
 };
 
-// Update a shop's name
 const updateShop = async (id, name) => {
   const result = await pool.query(
     'UPDATE shops SET name = \$1 WHERE id = \$2 RETURNING *',
@@ -42,23 +38,24 @@ const updateShop = async (id, name) => {
   return result.rows[0];
 };
 
-const deleteShop = async (id) => {
-  if (!id) {
-    throw new Error('ID is required');
+const deleteShop = async (shopId) => {
+  const client = await pool.connect();
+  try {
+      await client.query('BEGIN');
+      await client.query('DELETE FROM stock WHERE shop_id = \$1', [shopId]);
+      await client.query('DELETE FROM action_history WHERE shop_id = \$1', [shopId]);
+      const result = await client.query('DELETE FROM shops WHERE id = \$1 RETURNING *', [shopId]);
+      if (result.rows.length === 0) {
+          throw new Error('Shop not found');
+      }
+      await client.query('COMMIT');
+      return result.rows[0];
+  } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+  } finally {
+      client.release();
   }
-  
-  const result = await pool.query(
-    'DELETE FROM shops WHERE id = \$1 RETURNING *',
-    [id]
-  );
-  
-  if (result.rows.length === 0) {
-    console.warn(`Shop with ID ${id} not found`);
-    throw new Error('Shop not found');
-  }
-  
-  return result.rows[0];
 };
-
 
 module.exports = { createShop, getShops, getShopById, updateShop, deleteShop };

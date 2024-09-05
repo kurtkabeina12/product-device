@@ -92,8 +92,8 @@ describe('API Tests', () => {
         expect(response.body.name).toBe('Updated Test Shop');
     });
 
-    test('DELETE /shops/:id - Delete a shop', async () => {
-        const response = await request(app).delete(`/shops/${shopId}`);
+    test('DELETE /stock/:id - Delete stock', async () => {
+        const response = await request(app).delete(`/stock/${stockId}`);
         
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id');
@@ -101,15 +101,15 @@ describe('API Tests', () => {
 
     test('DELETE /products/:id - Delete a product', async () => {
         const response = await request(app).delete(`/products/${productId}`);
-        
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('id');
+    });
+    
+    test('DELETE /shops/:id - Delete a shop', async () => {
+        const response = await request(app).delete(`/shops/${shopId}`);
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('id');
     });
 
-    test('DELETE /stock/:id - Delete stock', async () => {
-        const response = await request(app).delete(`/stock/${stockId}`);
-        
-        expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('id');
-    });
+
 });

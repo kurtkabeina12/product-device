@@ -1,15 +1,16 @@
 const express = require('express');
-const { createStock, updateStock, getStock } = require('../models/stock');
+const { createStock, updateStock, getStock, deleteStock } = require('../models/stock');
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { productId, shopId, quantityOnShelf, quantityInOrder } = req.body;
   try {
-    const stock = await createStock(productId, shopId, quantityOnShelf, quantityInOrder);
-    res.status(201).json(stock);
+      const stock = await createStock(productId, shopId, quantityOnShelf, quantityInOrder);
+      res.status(201).json(stock);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+      console.error('Error creating stock:', err); // Log the error
+      res.status(500).json({ error: err.message });
   }
 });
 

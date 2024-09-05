@@ -1,23 +1,24 @@
-// models/stock.js
 const pool = require('../db');
 
 const createStock = async (productId, shopId, quantityOnShelf, quantityInOrder) => {
   if (!productId || !shopId) {
-    throw new Error('Product ID and Shop ID are required');
+      throw new Error('Product ID and Shop ID are required');
   }
 
+  console.log(`Creating stock for Product ID: ${productId}, Shop ID: ${shopId}, Quantity on Shelf: ${quantityOnShelf}, Quantity in Order: ${quantityInOrder}`);
+
   const existingStock = await pool.query(
-    'SELECT * FROM stock WHERE product_id = \$1 AND shop_id = \$2',
-    [productId, shopId]
+      'SELECT * FROM stock WHERE product_id = \$1 AND shop_id = \$2',
+      [productId, shopId]
   );
 
   if (existingStock.rows.length > 0) {
-    return updateStock(existingStock.id, quantityOnShelf, quantityInOrder);
+      return updateStock(existingStock.rows[0].id, quantityOnShelf, quantityInOrder);
   }
 
   const result = await pool.query(
-    'INSERT INTO stock (product_id, shop_id, quantity_on_shelf, quantity_in_order) VALUES (\$1, \$2, \$3, \$4) RETURNING *',
-    [productId, shopId, quantityOnShelf, quantityInOrder]
+      'INSERT INTO stock (product_id, shop_id, quantity_on_shelf, quantity_in_order) VALUES (\$1, \$2, \$3, \$4) RETURNING *',
+      [productId, shopId, quantityOnShelf, quantityInOrder]
   );
   return result.rows[0];
 };
@@ -77,17 +78,17 @@ const getStock = async (filters) => {
 
 const deleteStock = async (id) => {
   if (!id) {
-    throw new Error('ID is required');
+      throw new Error('ID is required');
   }
   
   const result = await pool.query(
-    'DELETE FROM stock WHERE id = \$1 RETURNING *',
-    [id]
+      'DELETE FROM stock WHERE id = \$1 RETURNING *',
+      [id]
   );
   
   if (result.rows.length === 0) {
-    console.warn(`Stock entry with ID ${id} not found`);
-    throw new Error('Stock entry not found');
+      console.warn(`Stock entry with ID ${id} not found`);
+      return null; // Indicate that nothing was deleted
   }
   
   return result.rows[0];

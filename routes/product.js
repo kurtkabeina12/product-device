@@ -1,5 +1,5 @@
 const express = require('express');
-const { createProduct, getProducts } = require('../models/product');
+const { createProduct, getProducts, deleteProduct } = require('../models/product');
 const router = express.Router();
 
 router.post('/', async (req, res) => {

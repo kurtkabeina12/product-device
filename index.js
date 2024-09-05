@@ -1,7 +1,7 @@
 const express = require('express');
 const productRoutes = require('./routes/product.js');
 const stockRoutes = require('./routes/stock.js');
-const actionHistoryRoutes = require('./routes/actionHistory.js');
+const actionHistoryRoutes = require('./dist/routes/actionHistory').default; 
 const shopRoutes = require('./routes/shop.js'); 
 
 const app = express();
